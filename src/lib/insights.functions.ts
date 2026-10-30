@@ -32,8 +32,8 @@ export const getInsights = createServerFn({ method: "GET" })
     const [intentionsResult, reflectionsResult] = await Promise.all([
       context.supabase.from("intentions").select("*").eq("user_id", context.userId),
       context.supabase
-        .select("intention_id")
         .from("reflections")
+        .select("intention_id")
         .eq("user_id", context.userId),
     ]);
     if (intentionsResult.error) throw new Error(intentionsResult.error.message);
