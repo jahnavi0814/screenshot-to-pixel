@@ -41,14 +41,7 @@ function OnboardingPage() {
   const finish = async () => {
     setSaving(true);
     try {
-      if (firstTitle.trim()) {
-        await createIntention({
-          title: firstTitle.trim(),
-          why_it_matters: firstWhy.trim(),
-          blocker: blocker.trim(),
-          category: "other",
-        });
-      }
+      // completeOnboarding creates the first intention itself when one was given.
       await completeOnboarding({
         blocker: blocker.trim(),
         categories,
