@@ -55,11 +55,30 @@ export const updateIntention = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { id, archived, ...fields } = data;
-    const payload: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(fields)) {
-      if (value === undefined) continue;
-      payload[key] = value === "" && key !== "title" ? null : value;
-    }
+    const payload: {
+      title?: string;
+      description?: string | null;
+      why_it_matters?: string | null;
+      blocker?: string | null;
+      category?: string;
+      next_step?: string | null;
+      timeframe?: string | null;
+      people_involved?: string | null;
+      notes?: string | null;
+      archived?: boolean;
+    } = {};
+    payload.title = fields.title;
+    payload.category = fields.category;
+    if (fields.description !== undefined)
+      payload.description = fields.description || null;
+    if (fields.why_it_matters !== undefined)
+      payload.why_it_matters = fields.why_it_matters || null;
+    if (fields.blocker !== undefined) payload.blocker = fields.blocker || null;
+    if (fields.next_step !== undefined) payload.next_step = fields.next_step || null;
+    if (fields.timeframe !== undefined) payload.timeframe = fields.timeframe || null;
+    if (fields.people_involved !== undefined)
+      payload.people_involved = fields.people_involved || null;
+    if (fields.notes !== undefined) payload.notes = fields.notes || null;
     if (archived !== undefined) payload.archived = archived;
     const { data: updated, error } = await context.supabase
       .from("intentions")
@@ -150,4 +169,18 @@ export const listIntentions = createServerFn({ method: "GET" })
     const { data: rows, error } = await query;
     if (error) throw new Error(error.message);
     return rows ?? [];
+  });
+
+export const getIntention = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await context.supabase
+      .from("intentions")
+      .select("*")
+      .eq("id", data.id)
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return row;
   });

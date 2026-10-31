@@ -33,9 +33,19 @@ export const updateMyProfile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => profileSchema.parse(input))
   .handler(async ({ data, context }) => {
+    const payload: {
+      full_name?: string;
+      preferred_theme?: "light" | "dark" | "system";
+      reflection_cadence?: "weekly" | "occasional";
+    } = {};
+    if (data.full_name !== undefined) payload.full_name = data.full_name;
+    if (data.preferred_theme !== undefined)
+      payload.preferred_theme = data.preferred_theme;
+    if (data.reflection_cadence !== undefined)
+      payload.reflection_cadence = data.reflection_cadence;
     const { data: updated, error } = await context.supabase
       .from("profiles")
-      .update(data)
+      .update(payload)
       .eq("id", context.userId)
       .select("*")
       .single();
