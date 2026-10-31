@@ -4,7 +4,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { completeOnboarding } from "@/lib/profile.functions";
-import { createIntention } from "@/lib/intentions.functions";
 import { CATEGORIES, CATEGORY_LABELS } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
