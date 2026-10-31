@@ -107,18 +107,21 @@ export const getInsights = createServerFn({ method: "GET" })
 
     // Only claim what the data supports.
     const sentences: string[] = [];
-    if (categoryCounts.length > 0 && (categoryCounts[0]?.count ?? 0) >= 2) {
+    const topCategory = categoryCounts[0];
+    if (topCategory && topCategory.count >= 2) {
       sentences.push(
-        `You've saved ${categoryCounts[0].count} ${categoryCounts[0].label.toLowerCase()} intentions — more than any other kind.`,
+        `You've saved ${topCategory.count} ${topCategory.label.toLowerCase()} intentions — more than any other kind.`,
       );
     }
-    if (topRevisited.length > 0 && topRevisited[0].revisitCount >= 2) {
+    const topRevisitedIntention = topRevisited[0];
+    if (topRevisitedIntention && topRevisitedIntention.revisitCount >= 2) {
       sentences.push(
-        `“${topRevisited[0].title}” has come back to you ${topRevisited[0].revisitCount} times. Has something changed?`,
+        `“${topRevisitedIntention.title}” has come back to you ${topRevisitedIntention.revisitCount} times. Has something changed?`,
       );
     }
-    if (blockers.length > 0 && blockers[0].count >= 2) {
-      sentences.push(`A familiar theme appears: “${blockers[0].blocker}”.`);
+    const topBlocker = blockers[0];
+    if (topBlocker && topBlocker.count >= 2) {
+      sentences.push(`A familiar theme appears: “${topBlocker.blocker}”.`);
     }
     if (postponed.length > 0) {
       sentences.push(

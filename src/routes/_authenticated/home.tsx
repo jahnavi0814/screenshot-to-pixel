@@ -6,14 +6,8 @@ import { PlusCircle } from "lucide-react";
 import { listIntentions } from "@/lib/intentions.functions";
 import { getWeeklySummary } from "@/lib/reflections.functions";
 import { getMyProfile } from "@/lib/profile.functions";
-import {
-  CATEGORY_LABELS,
-  STATUS_LABELS,
-  REFLECTION_PROMPTS,
-  timeGreeting,
-  type Category,
-  type Status,
-} from "@/lib/constants";
+import { REFLECTION_PROMPTS, timeGreeting } from "@/lib/constants";
+import { IntentionCard, type IntentionRow } from "@/components/intention-card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -28,17 +22,6 @@ export const Route = createFileRoute("/_authenticated/home")({
   }),
   component: HomePage,
 });
-
-type IntentionRow = {
-  id: string;
-  title: string;
-  description: string | null;
-  category: string;
-  status: string;
-  next_step: string | null;
-  created_at: string;
-  revisit_count: number;
-};
 
 function HomePage() {
   const listFn = useServerFn(listIntentions);
