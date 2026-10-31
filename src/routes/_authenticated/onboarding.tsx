@@ -29,6 +29,8 @@ function OnboardingPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+  const completeFn = useServerFn(completeOnboarding);
+
   const [step, setStep] = useState(0);
   const [firstTitle, setFirstTitle] = useState("");
   const [firstWhy, setFirstWhy] = useState("");
@@ -41,13 +43,15 @@ function OnboardingPage() {
     setSaving(true);
     try {
       // completeOnboarding creates the first intention itself when one was given.
-      await completeOnboarding({
-        blocker: blocker.trim(),
-        categories,
-        cadence,
-        firstAlmost: firstTitle.trim()
-          ? { title: firstTitle.trim(), why_it_matters: firstWhy.trim() }
-          : undefined,
+      await completeFn({
+        data: {
+          blocker: blocker.trim(),
+          categories,
+          cadence,
+          firstAlmost: firstTitle.trim()
+            ? { title: firstTitle.trim(), why_it_matters: firstWhy.trim() }
+            : undefined,
+        },
       });
       await queryClient.invalidateQueries();
       navigate({ to: "/home", replace: true });
