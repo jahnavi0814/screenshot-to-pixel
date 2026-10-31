@@ -1,10 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { completeOnboarding } from "@/lib/profile.functions";
-import { createIntention } from "@/lib/intentions.functions";
 import { CATEGORIES, CATEGORY_LABELS } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,6 +29,8 @@ function OnboardingPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+  const completeFn = useServerFn(completeOnboarding);
+
   const [step, setStep] = useState(0);
   const [firstTitle, setFirstTitle] = useState("");
   const [firstWhy, setFirstWhy] = useState("");
@@ -42,13 +43,15 @@ function OnboardingPage() {
     setSaving(true);
     try {
       // completeOnboarding creates the first intention itself when one was given.
-      await completeOnboarding({
-        blocker: blocker.trim(),
-        categories,
-        cadence,
-        firstAlmost: firstTitle.trim()
-          ? { title: firstTitle.trim(), why_it_matters: firstWhy.trim() }
-          : undefined,
+      await completeFn({
+        data: {
+          blocker: blocker.trim(),
+          categories,
+          cadence,
+          firstAlmost: firstTitle.trim()
+            ? { title: firstTitle.trim(), why_it_matters: firstWhy.trim() }
+            : undefined,
+        },
       });
       await queryClient.invalidateQueries();
       navigate({ to: "/home", replace: true });
