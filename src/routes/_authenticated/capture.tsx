@@ -28,6 +28,7 @@ function CapturePage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const createFn = useServerFn(createIntention);
+  const setNextStepFn = useServerFn(setNextStep);
 
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -51,17 +52,20 @@ function CapturePage() {
     try {
       // The "small version" is saved as the first next step.
       const created = await createFn({
-        title: title.trim(),
-        why_it_matters: why.trim(),
-        blocker: blocker.trim(),
-        category: category as (typeof CATEGORIES)[number],
-        people_involved: people.trim(),
-        timeframe: timeframe.trim(),
-        notes: notes.trim(),
+        data: {
+          title: title.trim(),
+          why_it_matters: why.trim(),
+          blocker: blocker.trim(),
+          category: category as (typeof CATEGORIES)[number],
+          people_involved: people.trim(),
+          timeframe: timeframe.trim(),
+          notes: notes.trim(),
+        },
       });
       if (smallVersion.trim()) {
-        const { setNextStep } = await import("@/lib/intentions.functions");
-        await setNextStep({ data: { id: (created as { id: string }).id, next_step: smallVersion.trim() } });
+        await setNextStepFn({
+          data: { id: (created as { id: string }).id, next_step: smallVersion.trim() },
+        });
       }
       await queryClient.invalidateQueries({ queryKey: ["intentions"] });
       setSaved(true);
