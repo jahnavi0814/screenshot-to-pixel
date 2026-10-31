@@ -17,6 +17,8 @@ import { Route as AuthenticatedAlmostsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedCaptureRouteImport } from './routes/_authenticated/capture'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedAlmostsIndexRouteImport } from './routes/_authenticated/almosts.index'
+import { Route as AuthenticatedAlmostsIdRouteImport } from './routes/_authenticated/almosts.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -57,24 +59,38 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAlmostsIndexRoute =
+  AuthenticatedAlmostsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAlmostsRoute,
+  } as any)
+const AuthenticatedAlmostsIdRoute = AuthenticatedAlmostsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AuthenticatedAlmostsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/almosts': typeof AuthenticatedAlmostsRoute
+  '/almosts': typeof AuthenticatedAlmostsRouteWithChildren
   '/capture': typeof AuthenticatedCaptureRoute
   '/home': typeof AuthenticatedHomeRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/almosts/$id': typeof AuthenticatedAlmostsIdRoute
+  '/almosts/': typeof AuthenticatedAlmostsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/almosts': typeof AuthenticatedAlmostsRoute
   '/capture': typeof AuthenticatedCaptureRoute
   '/home': typeof AuthenticatedHomeRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/almosts/$id': typeof AuthenticatedAlmostsIdRoute
+  '/almosts': typeof AuthenticatedAlmostsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -82,10 +98,12 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/_authenticated/almosts': typeof AuthenticatedAlmostsRoute
+  '/_authenticated/almosts': typeof AuthenticatedAlmostsRouteWithChildren
   '/_authenticated/capture': typeof AuthenticatedCaptureRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/_authenticated/almosts/$id': typeof AuthenticatedAlmostsIdRoute
+  '/_authenticated/almosts/': typeof AuthenticatedAlmostsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,15 +115,18 @@ export interface FileRouteTypes {
     | '/capture'
     | '/home'
     | '/onboarding'
+    | '/almosts/$id'
+    | '/almosts/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/reset-password'
-    | '/almosts'
     | '/capture'
     | '/home'
     | '/onboarding'
+    | '/almosts/$id'
+    | '/almosts'
   id:
     | '__root__'
     | '/'
@@ -116,6 +137,8 @@ export interface FileRouteTypes {
     | '/_authenticated/capture'
     | '/_authenticated/home'
     | '/_authenticated/onboarding'
+    | '/_authenticated/almosts/$id'
+    | '/_authenticated/almosts/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -183,18 +206,45 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/almosts/': {
+      id: '/_authenticated/almosts/'
+      path: '/'
+      fullPath: '/almosts/'
+      preLoaderRoute: typeof AuthenticatedAlmostsIndexRouteImport
+      parentRoute: typeof AuthenticatedAlmostsRoute
+    }
+    '/_authenticated/almosts/$id': {
+      id: '/_authenticated/almosts/$id'
+      path: '/$id'
+      fullPath: '/almosts/$id'
+      preLoaderRoute: typeof AuthenticatedAlmostsIdRouteImport
+      parentRoute: typeof AuthenticatedAlmostsRoute
+    }
   }
 }
 
+interface AuthenticatedAlmostsRouteChildren {
+  AuthenticatedAlmostsIdRoute: typeof AuthenticatedAlmostsIdRoute
+  AuthenticatedAlmostsIndexRoute: typeof AuthenticatedAlmostsIndexRoute
+}
+
+const AuthenticatedAlmostsRouteChildren: AuthenticatedAlmostsRouteChildren = {
+  AuthenticatedAlmostsIdRoute: AuthenticatedAlmostsIdRoute,
+  AuthenticatedAlmostsIndexRoute: AuthenticatedAlmostsIndexRoute,
+}
+
+const AuthenticatedAlmostsRouteWithChildren =
+  AuthenticatedAlmostsRoute._addFileChildren(AuthenticatedAlmostsRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAlmostsRoute: typeof AuthenticatedAlmostsRoute
+  AuthenticatedAlmostsRoute: typeof AuthenticatedAlmostsRouteWithChildren
   AuthenticatedCaptureRoute: typeof AuthenticatedCaptureRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAlmostsRoute: AuthenticatedAlmostsRoute,
+  AuthenticatedAlmostsRoute: AuthenticatedAlmostsRouteWithChildren,
   AuthenticatedCaptureRoute: AuthenticatedCaptureRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
